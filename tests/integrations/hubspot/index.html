@@ -4,63 +4,22 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="Partytown Test Page" />
-
     <title>Hubspot 🎉</title>
-
     <script>
       partytown = {
-        init: {
-          dataLayer: {
-            push: {},
-          },
-          _hsq: {
-            push: {},
-          },
-          intercom: {},
-          some: {
-            crazyFn: {},
-            idkProps: {
-              supFn: {},
-              moreProps: {
-                awesomeFn: {},
-              },
-            },
-          },
-        },
         debug: true,
-        logCalls: false,
-        logGetters: false,
-        logSetters: false,
+        forward: [],
+        logCalls: true,
+        logGetters: true,
+        logSetters: true,
+        logImageRequests: true,
+        logSendBeaconRequests: true,
         logStackTraces: false,
-        logScriptExecution: false,
+        logScriptExecution: true,
       };
+      localStorage.setItem('LEADIN_DEBUG', 'true');
     </script>
-    <script>
-      (function (window, document, config, script) {
-        function addPatch(target, initConfig, fullPath, targetPath, key, hasProps) {
-          for (key in initConfig) {
-            hasProps = targetPath = fullPath + '.' + key;
-            if (!addPatch((target[key] = {}), initConfig[key], targetPath)) {
-              target[key] = function () {
-                ptq.push(targetPath, arguments);
-              };
-            }
-          }
-          return hasProps;
-        }
-
-        window.ptq = [];
-
-        config = window.partytown || {};
-        addPatch(window, config.init || {});
-
-        script = document.createElement('script');
-        script.async = script.defer = true;
-        script.src = '/~partytown/partytown.' + (config.debug ? 'debug.js' : 'js');
-        document.head.appendChild(script);
-      })(window, document);
-    </script>
-
+    <script src="/~partytown/debug/partytown-snippet.js"></script>
     <link
       rel="icon"
       id="favicon"
@@ -106,22 +65,8 @@
     </style>
   </head>
   <body>
-    <h1>Hubspot 🎉</h1>
-
-    <script charset="utf-8" type="text/partytown" src="./shell.js"></script>
-    <script type="text/partytown">
-      hbspt.forms.create({
-        region: 'na1',
-        portalId: '20632911',
-        formId: '3f9fe70f-fb7c-4b7d-a570-c6ef2a6c54ea',
-      });
-    </script>
-
-    <hr />
-    <ul>
-      <li><a href="/integrations/hubspot/standard.html">Standard Hubspot</a></li>
-      <li><a href="/integrations/">All Integration Tests</a></li>
-      <li><a href="/">All Tests</a></li>
-    </ul>
+    <h1>Hubspot Tracking 🎉</h1>
+    <script type="text/partytown" id="hs-script-loader" async defer src="./20632911.js"></script>
+    <a href="/">All Tests</a>
   </body>
 </html>
