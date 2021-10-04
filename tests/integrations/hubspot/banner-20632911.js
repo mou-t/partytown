@@ -1902,6 +1902,7 @@ _hsp.push(['setApiBaseUrl', 'https://js.hs-banner.com/cookie-banner']);
           {
             key: 'setCookie',
             value: function (e, t, i) {
+              console.warn('setCookie', e, t, i);
               var n = i.expires + i.path + i.domain + i.sameSite + i.secure;
               this.writeCookie(e + '=' + t + n);
               var o = this.get(e);

@@ -1,4 +1,4 @@
-import { callMethod, proxy } from './worker-proxy';
+import { callMethod, createGlobalConstructorProxy, proxy } from './worker-proxy';
 import {
   constructInstance,
   elementConstructors,
@@ -11,27 +11,42 @@ import { HTMLIFrameElement, Window } from './worker-iframe';
 import { HTMLImageElement } from './worker-image';
 import { HTMLScriptElement } from './worker-script';
 import { InstanceIdKey, webWorkerCtx, WinIdKey } from './worker-constants';
-import { InterfaceType, MemberTypeInfo, PlatformInstanceId } from '../types';
+import {
+  InterfaceInfo,
+  InterfaceType,
+  MembersInterfaceTypeInfo,
+  PlatformInstanceId,
+} from '../types';
 import { nextTick, TOP_WIN_ID } from '../utils';
 import { Node } from './worker-node';
 import { sendBeacon } from './worker-exec';
 
 export const initWebWorkerGlobal = (
   self: any,
-  windowMemberTypeInfo: MemberTypeInfo,
+  windowMemberTypeInfo: MembersInterfaceTypeInfo,
+  interfaces: InterfaceInfo[],
   htmlCstrNames: string[]
 ) => {
   self[WinIdKey] = webWorkerCtx.$winId$;
   self[InstanceIdKey] = PlatformInstanceId.window;
 
-  Object.keys(windowMemberTypeInfo).forEach((memberName) => {
-    if (!self[memberName] && windowMemberTypeInfo[memberName] === InterfaceType.Method) {
-      self[memberName] = (...args: any[]) => callMethod(self, [memberName], args);
+  Object.keys(windowMemberTypeInfo).map((memberName) => {
+    const interfaceType = windowMemberTypeInfo[memberName];
+
+    if (!self[memberName] && interfaceType > InterfaceType.DocumentFragmentNode) {
+      // this global doesn't already exist in the worker
+      // and the interface type isn't a DOM Node or Window object
+      if (interfaceType === InterfaceType.Function) {
+        // this is a global function, like alert()
+        self[memberName] = (...args: any[]) => callMethod(self, [memberName], args);
+      } else {
+        // this is a global implementation, like localStorage
+        self[memberName] = proxy(interfaceType, self, [memberName]);
+      }
     }
   });
 
-  self.requestAnimationFrame = (cb: (t: number) => void) => nextTick(() => cb(Date.now()), 9);
-  self.cancelAnimationFrame = clearTimeout;
+  interfaces.map((i) => createGlobalConstructorProxy(self, i[0], i[1]));
 
   Object.defineProperty(self, 'location', {
     get: () => webWorkerCtx.$location$,
@@ -39,10 +54,6 @@ export const initWebWorkerGlobal = (
   });
 
   self.document = constructInstance(InterfaceType.Document, PlatformInstanceId.document);
-  self.history = proxy(InterfaceType.History, self, ['history']);
-  self.localStorage = proxy(InterfaceType.Storage, self, ['localStorage']);
-  self.screen = proxy(InterfaceType.Object, self, ['screen']);
-  self.sessionStorage = proxy(InterfaceType.Storage, self, ['sessionStorage']);
 
   navigator.sendBeacon = sendBeacon;
 
@@ -60,11 +71,10 @@ export const initWebWorkerGlobal = (
     self.top = constructInstance(InterfaceType.Window, PlatformInstanceId.window, TOP_WIN_ID);
   }
 
-  self.HTMLDocument = self.Document = HTMLDocument;
+  self.Document = HTMLDocument;
   self.HTMLElement = self.Element = HTMLElement;
   self.Image = HTMLImageElement;
   self.Node = Node;
-  self.Window = Window;
 
   htmlCstrNames.map((htmlCstrName) => {
     if (!self[htmlCstrName]) {

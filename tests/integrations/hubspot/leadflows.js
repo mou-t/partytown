@@ -1595,7 +1595,9 @@ Object.defineProperties = Object.defineProperties || defineProperties;
     getCookie: function (e) {
       var a, n, t, i, l;
       n = null;
-      if (document.cookie && '' !== document.cookie)
+      console.warn('document.cookie', document.cookie);
+      console.warn('document.baseURI', document.baseURI);
+      if (document.cookie && '' !== document.cookie) {
         for (i = 0, l = (t = document.cookie.split(';')).length; i < l; i++) {
           a = t[i];
           if ((a = this.trim(a)).substring(0, e.length + 1) === e + '=') {
@@ -1603,6 +1605,7 @@ Object.defineProperties = Object.defineProperties || defineProperties;
             break;
           }
         }
+      }
       return n;
     },
     getEnv: function () {
@@ -1618,7 +1621,9 @@ Object.defineProperties = Object.defineProperties || defineProperties;
       null == n && (n = 63072e6);
       (t = new Date()).setTime(t.getTime() + n);
       i = t.toGMTString();
-      return (document.cookie = e + '=' + a + ';expires=' + i + ';path=/');
+      const setCookie = (document.cookie = e + '=' + a + ';expires=' + i + ';path=/');
+      console.warn('setCookie', setCookie);
+      return setCookie;
     },
     deleteCookie: function (e) {
       return (document.cookie = e + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT; path=/');
@@ -3896,16 +3901,26 @@ window.MutationObserver =
       return e();
     }, t);
     return (a = setInterval(function () {
-      var t, i, l;
+      var cookiesFound, cookiesNotAllowed, cookieValue;
       leadflows.logger.debug('Polling for cookies');
-      l = s();
-      t = window.leadflows.cookies.hasCookies && Boolean(l);
-      i = !1 === window.leadflows.cookies.allowed;
-      if (t || i) {
+
+      cookieValue = s();
+      console.warn('cookieValue', cookieValue);
+
+      var hasCookies = window.leadflows.cookies.hasCookies;
+      var booleanCookieValue = Boolean(cookieValue);
+      cookiesFound = hasCookies && booleanCookieValue;
+
+      cookiesNotAllowed = false === window.leadflows.cookies.allowed;
+      console.warn(
+        `hasCookies: ${hasCookies}, booleanCookieValue: ${booleanCookieValue}, cookiesFound: ${cookiesFound}, cookiesNotAllowed: ${cookiesNotAllowed}`
+      );
+
+      if (cookiesFound || cookiesNotAllowed) {
         leadflows.logger.debug('cookies found or cookies not allowed');
         clearTimeout(n);
         clearInterval(a);
-        return l ? e(l) : e();
+        return cookieValue ? e(cookieValue) : e();
       }
     }, 100));
   };

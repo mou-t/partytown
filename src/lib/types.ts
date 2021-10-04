@@ -81,10 +81,8 @@ export interface InitWebWorkerData {
   $parentWinId$: number;
   $config$: PartytownConfig;
   $documentCompatMode$: string;
-  $documentCookie$: string;
   $documentReadyState$: string;
   $documentReferrer$: string;
-  $documentTitle$: string;
   $firstScriptId$: number;
   $htmlConstructors$: string[];
   $interfaces$: InterfaceInfo[];
@@ -101,38 +99,38 @@ export interface InitWebWorkerContext {
   $postMessage$: (msg: MessageFromWorkerToSandbox) => void;
 }
 
-export type InterfaceInfo = [InterfaceType, MemberTypeInfo];
+export type InterfaceInfo = [InterfaceType, string, MembersInterfaceTypeInfo];
 
-export interface MemberTypeInfo {
+export interface MembersInterfaceTypeInfo {
   [memberName: string]: InterfaceType;
 }
 
 export const enum InterfaceType {
-  Window = 0, // (node type 0 not used, so using for Window interface)
+  // NodeType 0 not used, so using for Window interface
+  Window = 0,
 
   // https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType
+  Element = 1,
+  AttributeNode = 2,
+  TextNode = 3,
+  CDataSectionNode = 4,
+  ProcessingInstructionNode = 7,
+  CommentNode = 8,
+  Document = 9,
+  DocumentTypeNode = 10,
+  DocumentFragmentNode = 11,
 
-  Element = 1, // ELEMENT_NODE
-  AttributeNode = 2, // ATTRIBUTE_NODE
-  TextNode = 3, // TEXT_NODE
-  CDataSectionNode = 4, // CDATA_SECTION_NODE
-
-  DOMTokenList = 5, // (node type 5 not used in the standard)
-  NodeList = 6, // (node type 6 not used in the standard)
-
-  ProcessingInstructionNode = 7, // PROCESSING_INSTRUCTION_NODE
-  CommentNode = 8, // COMMENT_NODE
-  Document = 9, // DOCUMENT_NODE
-  DocumentTypeNode = 10, // DOCUMENT_TYPE_NODE
-  DocumentFragmentNode = 11, // DOCUMENT_FRAGMENT_NODE
-
-  CSSStyleDeclaration = 12,
-  DOMStringMap = 13,
-  History = 14,
-  Method = 15,
-  NamedNodeMap = 16,
-  Storage = 17,
-  Object = 18,
+  // Global Constructors and window function implementations
+  Function = 12,
+  CSSStyleDeclaration = 13,
+  DOMStringMap = 14,
+  DOMTokenList = 15,
+  History = 16,
+  MutationObserver = 17,
+  NodeList = 18,
+  NamedNodeMap = 19,
+  Screen = 20,
+  Storage = 21,
 }
 
 export const enum PlatformInstanceId {
@@ -156,6 +154,7 @@ export const enum AccessType {
   Get,
   Set,
   CallMethod,
+  GlobalConstructor,
 }
 
 export interface MainAccessRequest {
@@ -189,7 +188,7 @@ export interface MainAccessResponse {
 export const enum SerializedType {
   Array,
   Instance,
-  Method,
+  Function,
   Object,
   Primitive,
   Ref,
@@ -199,7 +198,7 @@ export type SerializedArrayTransfer = [SerializedType.Array, (SerializedTransfer
 
 export type SerializedInstanceTransfer = [SerializedType.Instance, SerializedInstance];
 
-export type SerializedMethodTransfer = [SerializedType.Method];
+export type SerializedFunctionTransfer = [SerializedType.Function];
 
 export type SerializedObjectTransfer = [
   SerializedType.Object,
@@ -221,7 +220,7 @@ export interface SerializedRefTransferData {
 export type SerializedTransfer =
   | SerializedArrayTransfer
   | SerializedInstanceTransfer
-  | SerializedMethodTransfer
+  | SerializedFunctionTransfer
   | SerializedObjectTransfer
   | SerializedPrimitiveTransfer
   | SerializedPrimitiveTransfer
