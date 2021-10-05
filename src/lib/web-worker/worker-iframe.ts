@@ -42,8 +42,6 @@ export class HTMLIFrameElement extends HTMLSrcElement {
       xhr.send();
 
       if (xhr.status > 199 && xhr.status < 300) {
-        setInstanceStateValue(this, StateProp.loadError, false);
-
         iframeContent = updateIframeContent(url, xhr.responseText);
         if (this[ImmediateSettersKey]) {
           this[ImmediateSettersKey]!.push([
