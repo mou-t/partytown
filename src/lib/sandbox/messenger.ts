@@ -2,11 +2,9 @@ import { forwardMsgResolves, winCtxs } from './main-constants';
 import { getAndSetInstanceId } from './main-instances';
 import {
   InitWebWorkerData,
-  MainAccessRequest,
   MainAccessResponse,
   MainWindowContext,
   MessageFromWorkerToSandbox,
-  PartytownWebWorker,
   WorkerMessageType,
 } from '../types';
 import { initializedWorkerScript, readNextScript } from './read-main-scripts';
@@ -60,12 +58,3 @@ export const onMessageFromWebWorker = (
     winCtxs.forEach((winCtx) => winCtx.$worker$!.postMessage(msg));
   }
 };
-
-export const forwardToWorkerAccessHandler = (
-  worker: PartytownWebWorker,
-  accessReq: MainAccessRequest
-) =>
-  new Promise<MainAccessResponse>((resolve) => {
-    forwardMsgResolves.set(accessReq.$msgId$, resolve);
-    worker.postMessage([WorkerMessageType.ForwardWorkerAccessRequest, accessReq]);
-  });

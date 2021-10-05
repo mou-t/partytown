@@ -9414,6 +9414,8 @@ window.OutpostErrorReporter = (function () {
           }
           var l = e.MutationObserver || e.WebKitMutationObserver;
           i = 'function' == typeof l ? c(s) : u(s);
+
+          console.warn('MutationObserver1', i);
           n.requestFlush = i;
           function c(e) {
             var t = 1,
@@ -16699,6 +16701,7 @@ hns('hubspot');
         var a;
         null == i && (i = {});
         a = { type: t, eventName: e, id: n, data: i };
+        console.warn('callCallbackGlobably', JSON.stringify(a));
         return top.postMessage(a, '*');
       },
       runCustomerCallbackFunction: function (e, t, n, i) {
@@ -22565,7 +22568,6 @@ hns('hubspot.serializeArray', function (e) {
     };
     o.onload = function () {
       console.warn('hubspot onload', o);
-      debugger;
       return c(o, e, t);
     };
     l.appendChild(o);
@@ -22798,8 +22800,21 @@ hns('hubspot.serializeArray', function (e) {
         v = l(e);
         e.target = '#' + v;
       }
+
+      if (null != e.shell) {
+        console.warn('Get window.parent.HSFR');
+        const parentWindow = window.parent;
+        console.warn('parentWindow', parentWindow);
+        const hsfr = parentWindow.HSFR;
+        console.warn('past b.HSFR', hsfr);
+      }
+
       (b = null != e.shell ? window.parent : window).HSFR ||
         (b.HSFR = { FORM_COMPONENTS: [], RECAPTCHA_REQUESTED: !1, RECAPTCHA_INTERVAL: void 0 });
+
+      // b = null != e.shell ? window.parent : window;
+      // b.HSFR = { FORM_COMPONENTS: [], RECAPTCHA_REQUESTED: !1, RECAPTCHA_INTERVAL: void 0 };
+
       e.shell || (null == window._hsq && (window._hsq = []));
       d = null;
       if (e.hsFormDemo) {

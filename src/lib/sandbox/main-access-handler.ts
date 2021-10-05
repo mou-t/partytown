@@ -1,7 +1,13 @@
-import { AccessType, MainAccessRequest, MainAccessResponse, MainWindowContext } from '../types';
+import {
+  AccessType,
+  MainAccessRequest,
+  MainAccessResponse,
+  MainWindowContext,
+  WorkerMessageType,
+} from '../types';
 import { deserializeFromWorker, serializeForWorker } from './main-serialization';
 import { EMPTY_ARRAY, isPromise, len } from '../utils';
-import { forwardToWorkerAccessHandler } from './messenger';
+import { forwardMsgResolves } from './main-constants';
 import { getInstance, setInstanceId } from './main-instances';
 
 export const mainAccessHandler = async (
@@ -32,11 +38,23 @@ export const mainAccessHandler = async (
     let immediateSetterMemberNameLen;
 
     try {
+      if (memberPath.includes('forms')) {
+        console.log('sandbox', memberPath, 1);
+      }
+
       // deserialize the data, such as a getter value or function arguments
       data = deserializeFromWorker(accessReqTask.$data$);
 
+      if (memberPath.includes('forms')) {
+        console.log('sandbox', memberPath, 2);
+      }
+
       if (accessReq.$forwardToWorkerAccess$) {
         // same as continue;
+
+        if (memberPath.includes('forms')) {
+          console.log('sandbox', memberPath, 3);
+        }
       } else if (accessType === AccessType.GlobalConstructor) {
         // create a new instance of a global constructor
         setInstanceId(winCtx, new (winCtx.$window$ as any)[lastMemberName](...data), instanceId);
@@ -100,7 +118,28 @@ export const mainAccessHandler = async (
   }
 
   if (accessReq.$forwardToWorkerAccess$) {
-    return forwardToWorkerAccessHandler(winCtx.$worker$!, accessReq);
+    return new Promise<MainAccessResponse>((resolve) => {
+      forwardMsgResolves.set(accessReq.$msgId$, resolve);
+
+      if (accessReq.$tasks$[0].$memberPath$.includes('forms')) {
+        console.log(
+          'sandbox',
+          accessReq.$tasks$[0].$memberPath$,
+          '$forwardToWorkerAccess$',
+          accessRsp
+        );
+      }
+
+      if (accessReq.$tasks$[0].$memberPath$.includes('HSFR')) {
+        console.log(
+          `send to ${winCtx.$winId$}`,
+          'forwardToWorkerAccess HSFR',
+          accessReq,
+          winCtx.$worker$!
+        );
+      }
+      winCtx.$worker$!.postMessage([WorkerMessageType.ForwardWorkerAccessRequest, accessReq]);
+    });
   } else {
     return accessRsp;
   }

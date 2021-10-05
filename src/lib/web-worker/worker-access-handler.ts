@@ -57,7 +57,23 @@ export const workerAccessHandler = (accessReq: MainAccessRequest) => {
             accessReqTask.$newInstanceId$
           );
         } else {
+          if (memberPath.includes('forms')) {
+            console.warn(name, JSON.stringify(accessReqTask.$data$));
+            console.warn(name, 'memberPath', memberPath);
+            console.warn(name, 'instance', instance);
+            console.warn(
+              name,
+              'instance[lastMemberName]',
+              typeof instance[lastMemberName],
+              Array.isArray(data)
+            );
+            console.warn('after instance[lastMemberName]');
+          }
           rtnValue = instance[lastMemberName].apply(instance, data);
+
+          if (memberPath.includes('forms')) {
+            console.error('recieve ForwardWorkerAccessRequest6');
+          }
         }
       }
 
