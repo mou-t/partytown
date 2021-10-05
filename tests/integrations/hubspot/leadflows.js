@@ -1595,8 +1595,6 @@ Object.defineProperties = Object.defineProperties || defineProperties;
     getCookie: function (e) {
       var a, n, t, i, l;
       n = null;
-      console.warn('document.cookie', document.cookie);
-      console.warn('document.baseURI', document.baseURI);
       if (document.cookie && '' !== document.cookie) {
         for (i = 0, l = (t = document.cookie.split(';')).length; i < l; i++) {
           a = t[i];
@@ -3902,19 +3900,13 @@ window.MutationObserver =
     }, t);
     return (a = setInterval(function () {
       var cookiesFound, cookiesNotAllowed, cookieValue;
-      leadflows.logger.debug('Polling for cookies');
-
       cookieValue = s();
-      console.warn('cookieValue', cookieValue);
 
       var hasCookies = window.leadflows.cookies.hasCookies;
       var booleanCookieValue = Boolean(cookieValue);
       cookiesFound = hasCookies && booleanCookieValue;
 
       cookiesNotAllowed = false === window.leadflows.cookies.allowed;
-      console.warn(
-        `hasCookies: ${hasCookies}, booleanCookieValue: ${booleanCookieValue}, cookiesFound: ${cookiesFound}, cookiesNotAllowed: ${cookiesNotAllowed}`
-      );
 
       if (cookiesFound || cookiesNotAllowed) {
         leadflows.logger.debug('cookies found or cookies not allowed');
@@ -6444,7 +6436,6 @@ window.leadflows.DYNO_STATES = {
     try {
       f = JSON.parse(f);
     } catch (l) {
-      console.error(l);
       l;
       f = f;
     } finally {

@@ -32,19 +32,18 @@ export class HTMLIFrameElement extends HTMLSrcElement {
   set src(url: string) {
     let xhr = new XMLHttpRequest();
     let iframeContent: string;
-    let isSuccessfulLoad: boolean;
 
     url = resolveUrl(url) + '';
     if (this.src !== url) {
+      setInstanceStateValue(this, StateProp.loadError, undefined);
       setInstanceStateValue(this, StateProp.url, url);
 
       xhr.open('GET', url, false);
       xhr.send();
 
-      isSuccessfulLoad = xhr.status > 199 && xhr.status < 300;
-      setInstanceStateValue(this, StateProp.isSuccessfulLoad, isSuccessfulLoad);
+      if (xhr.status > 199 && xhr.status < 300) {
+        setInstanceStateValue(this, StateProp.loadError, false);
 
-      if (isSuccessfulLoad) {
         iframeContent = updateIframeContent(url, xhr.responseText);
         if (this[ImmediateSettersKey]) {
           this[ImmediateSettersKey]!.push([
@@ -54,6 +53,8 @@ export class HTMLIFrameElement extends HTMLSrcElement {
         } else {
           setter(this, ['srcdoc'], iframeContent);
         }
+      } else {
+        setInstanceStateValue(this, StateProp.loadError, xhr.status);
       }
     }
   }
