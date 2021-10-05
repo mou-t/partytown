@@ -38,23 +38,11 @@ export const mainAccessHandler = async (
     let immediateSetterMemberNameLen;
 
     try {
-      if (memberPath.includes('forms')) {
-        console.log('sandbox', memberPath, 1);
-      }
-
       // deserialize the data, such as a getter value or function arguments
       data = deserializeFromWorker(accessReqTask.$data$);
 
-      if (memberPath.includes('forms')) {
-        console.log('sandbox', memberPath, 2);
-      }
-
       if (accessReq.$forwardToWorkerAccess$) {
         // same as continue;
-
-        if (memberPath.includes('forms')) {
-          console.log('sandbox', memberPath, 3);
-        }
       } else if (accessType === AccessType.GlobalConstructor) {
         // create a new instance of a global constructor
         setInstanceId(winCtx, new (winCtx.$window$ as any)[lastMemberName](...data), instanceId);
