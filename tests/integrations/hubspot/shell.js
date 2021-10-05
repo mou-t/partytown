@@ -22564,11 +22564,10 @@ hns('hubspot.serializeArray', function (e) {
       return s(o, e);
     };
     o.onload = function () {
-      debugger;
       console.warn('hubspot onload', o);
+      debugger;
       return c(o, e, t);
     };
-    debugger;
     l.appendChild(o);
     return o;
   };
