@@ -46,10 +46,12 @@ export const onMessageFromWebWorker = (
   } else if (msgType === WorkerMessageType.ForwardWorkerAccessResponse) {
     const accessRsp = msg[1] as MainAccessResponse;
 
-    const forwardMsgResolve = forwardMsgResolves.get(accessRsp.$msgId$);
-    if (forwardMsgResolve) {
+    const forwardMsgResolveData = forwardMsgResolves.get(accessRsp.$msgId$);
+    if (forwardMsgResolveData) {
+      clearTimeout(forwardMsgResolveData[1]);
       forwardMsgResolves.delete(accessRsp.$msgId$);
-      forwardMsgResolve(accessRsp);
+
+      forwardMsgResolveData[0](accessRsp);
       readNextScript(winCtx);
     }
   } else if (msgType === WorkerMessageType.RunStateHandlers) {
