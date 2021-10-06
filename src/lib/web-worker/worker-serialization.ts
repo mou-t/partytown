@@ -9,7 +9,6 @@ import {
   SerializedRefTransferData,
   SerializedTransfer,
   SerializedType,
-  StateProp,
 } from '../types';
 import {
   InstanceIdKey,
