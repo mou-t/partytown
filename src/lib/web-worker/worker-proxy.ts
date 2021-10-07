@@ -60,6 +60,7 @@ const syncMessage = (
     $newInstanceId$,
     $contextWinId$,
   };
+  console.log('syncMessage in', name, JSON.stringify(accessReq));
 
   const accessRsp: MainAccessResponse = syncSendMessage(webWorkerCtx, accessReq);
 
@@ -123,6 +124,9 @@ export const callMethod = (
   contextWinId?: number
 ) => {
   const winId = instance[WinIdKey];
+  if (memberPath.includes('fn')) {
+    console.log('callMethod', memberPath, 'in', name);
+  }
 
   applyBeforeSyncSetters(winId, instance);
 

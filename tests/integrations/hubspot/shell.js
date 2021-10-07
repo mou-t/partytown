@@ -22786,6 +22786,7 @@ hns('hubspot.serializeArray', function (e) {
     return (e.formId = null != (n = e.formId) ? n.toString().trim() : void 0);
   };
   s = function (e) {
+    console.warn('called hubspot.forms.create(), in', name);
     var r, s, d, h, g, v, b;
     o(e);
     if (e.portalId && e.formId) {
@@ -22860,6 +22861,7 @@ hns('hubspot.serializeArray', function (e) {
   };
   null == window.hbspt && (window.hbspt = {});
   null == (r = window.hbspt).forms && (r.forms = {});
+  console.warn('assign window.hbspt.forms.create, in', window.name);
   window.hbspt.forms.create = s;
   hubspot.utils.ready(function () {
     return setTimeout(function () {
